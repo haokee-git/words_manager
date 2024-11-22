@@ -63,7 +63,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _meaningController = TextEditingController();
   final List<String> _selectedTypes = [];
   String appBarTitle = '单词管理器';
-  String _searchQuery = '';
 
   @override
   void initState() {
@@ -95,7 +94,8 @@ class _MyHomePageState extends State<MyHomePage> {
               '单词不能为空',
               style: TextStyle(color: Color.fromARGB(255, 64, 64, 64)),
             ),
-            backgroundColor: Color.fromARGB(255, 232, 223, 238)),
+            backgroundColor: Color.fromARGB(255, 232, 223, 238),
+            duration: Duration(seconds: 1)),
       );
       return;
     }
@@ -110,7 +110,8 @@ class _MyHomePageState extends State<MyHomePage> {
               '不能有相同的单词',
               style: TextStyle(color: Color.fromARGB(255, 64, 64, 64)),
             ),
-            backgroundColor: Color.fromARGB(255, 232, 223, 238)),
+            backgroundColor: Color.fromARGB(255, 232, 223, 238),
+            duration: Duration(seconds: 1)),
       );
       return;
     }
@@ -124,7 +125,8 @@ class _MyHomePageState extends State<MyHomePage> {
             '单词添加成功',
             style: TextStyle(color: Color.fromARGB(255, 64, 64, 64)),
           ),
-          backgroundColor: Color.fromARGB(255, 232, 223, 238)),
+          backgroundColor: Color.fromARGB(255, 232, 223, 238),
+          duration: Duration(seconds: 1)),
     );
     setState(() {}); // 刷新页面
   }
@@ -633,7 +635,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       _searchQuery = query;
                     });
                   },
-                  controller: TextEditingController(text: _searchQuery),
                 ),
               ),
               IconButton(
@@ -718,4 +719,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ],
     );
   }
+
+  String _searchQuery = '';
 }
