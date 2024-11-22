@@ -13,9 +13,11 @@ void main() async {
     backgroundColor: Colors.transparent,
     skipTaskbar: false,
     minimumSize: Size(640, 360),
-    title: '单词管理器'
+    title: '单词管理器',
+    titleBarStyle: TitleBarStyle.hidden, // 隐藏默认标题栏
   );
   windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.setAsFrameless();
     await windowManager.show();
     await windowManager.focus();
   });
@@ -200,56 +202,96 @@ class _MyHomePageState extends State<MyHomePage> {
       _buildFavoriteWordsPage(),
     ];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('单词管理器'),
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.purple, width: 0.5), // 添加紫色边框
       ),
-      body: Row(
-        children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: _showIconsOnly ? 70 : 250,
-            child: Drawer(
-              child: Column(
-                children: <Widget>[
-                  ListTile(
-                    leading: const Icon(Icons.menu),
-                    title: _showText ? const Text('只显示图标') : null,
-                    onTap: _toggleShowIconsOnly,
-                  ),
-                  Expanded(
-                    child: ListView(
-                      padding: EdgeInsets.zero,
-                      children: <Widget>[
-                        ListTile(
-                          leading: const Icon(Icons.home),
-                          title: _showText ? const Text('首页') : null,
-                          onTap: () => _onItemTapped(0),
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.add),
-                          title: _showText ? const Text('新单词') : null,
-                          onTap: () => _onItemTapped(1),
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.favorite),
-                          title: _showText ? const Text('收藏') : null,
-                          onTap: () => _onItemTapped(2),
-                        ),
-                      ],
+      child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(50.0),
+          child: GestureDetector(
+            onPanStart: (details) {
+              windowManager.startDragging();
+            },
+            child: AppBar(
+              title: const Text('单词管理器'),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.remove),
+                  onPressed: () {
+                    windowManager.minimize();
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.crop_square),
+                  onPressed: () {
+                    windowManager.isMaximized().then((isMaximized) {
+                      if (isMaximized) {
+                        windowManager.unmaximize();
+                      } else {
+                        windowManager.maximize();
+                      }
+                    });
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () {
+                    windowManager.close();
+                  },
+                ),
+                const SizedBox(width: 5)
+              ],
+            ),
+          ),
+        ),
+        body: Row(
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: _showIconsOnly ? 70 : 250,
+              child: Drawer(
+                child: Column(
+                  children: <Widget>[
+                    ListTile(
+                      leading: const Icon(Icons.menu),
+                      title: _showText ? const Text('只显示图标') : null,
+                      onTap: _toggleShowIconsOnly,
                     ),
-                  ),
-                ],
+                    Expanded(
+                      child: ListView(
+                        padding: EdgeInsets.zero,
+                        children: <Widget>[
+                          ListTile(
+                            leading: const Icon(Icons.home),
+                            title: _showText ? const Text('首页') : null,
+                            onTap: () => _onItemTapped(0),
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.add),
+                            title: _showText ? const Text('新单词') : null,
+                            onTap: () => _onItemTapped(1),
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.favorite),
+                            title: _showText ? const Text('收藏') : null,
+                            onTap: () => _onItemTapped(2),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: Container(
-              color: Colors.white,
-              child: _pages[_selectedIndex],
+            Expanded(
+              child: Container(
+                color: Colors.white,
+                child: _pages[_selectedIndex],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -418,8 +460,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.favorite),
-                    color: Colors.red,
+                    icon: Icon(
+                      word['favorite'] ? Icons.favorite : Icons.favorite_border,
+                      color: word['favorite'] ? Colors.red : null,
+                    ),
                     onPressed: () => _toggleFavorite(word['word']!),
                   ),
                   IconButton(
