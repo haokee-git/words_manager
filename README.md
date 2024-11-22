@@ -13,3 +13,7 @@ All words are saved to the words_manager folder under the system documents folde
 程序分为了三个页面：主页、新建单词页面和喜欢的单词页面。在主页，你可以查阅加入的所有单词的英文、中文和词性；在新建单词页面，你可以填写新建的单词的信息，并勾选适合的词性以便添入主页；喜欢的单词则是展览了所有点了红心的单词，可以在主页对单词进行基本操作，包括删除和点红心。值得注意的是，应用没有提供对已经加入的单词进行修改的页面，这代表着加入的单词必须保证是无错误的，否则只能删除重新添加。这是为了确保不会被人恶意篡改单词。
 
 所有的单词全部保存到系统文档文件夹下的 words_manager 文件夹，单个单词存放进一个文件中，文件名即单词英文（无后缀名）。具体格式可以自行操作得到。
+
+## Installation | 安装
+
+可以在 [Release 页面](https://github.com/haokee-git/words_manager/releases) 内进行下载。考虑到中国国内的朋友们，如果下载速度过慢的情况下，可以使用与 Release 页面同步更新的 [123 云盘链接](https://www.123684.com/s/OkLLVv-DasBH) 进行下载。
