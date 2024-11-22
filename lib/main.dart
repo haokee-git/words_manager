@@ -63,6 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _meaningController = TextEditingController();
   final List<String> _selectedTypes = [];
   String appBarTitle = '单词管理器';
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -189,6 +190,10 @@ class _MyHomePageState extends State<MyHomePage> {
           appBarTitle = '单词管理器 - 收藏';
           windowManager.setTitle('单词管理器 - 收藏');
           break;
+        case 3:
+          appBarTitle = '单词管理器 - 搜索';
+          windowManager.setTitle('单词管理器 - 搜索');
+          break;
         default:
           appBarTitle = '单词管理器';
           windowManager.setTitle('单词管理器');
@@ -244,13 +249,12 @@ class _MyHomePageState extends State<MyHomePage> {
       _buildHomePage(),
       _buildNewWordPage(),
       _buildFavoriteWordsPage(),
+      _buildSearchPage(), // 添加搜索页面
     ];
 
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(
-            color: const Color.fromARGB(255, 177, 132, 255),
-            width: 0.7), // 添加边框
+        border: Border.all(color: Colors.purple, width: 0.5), // 添加紫色边框
       ),
       child: Scaffold(
         appBar: PreferredSize(
@@ -260,22 +264,18 @@ class _MyHomePageState extends State<MyHomePage> {
               windowManager.startDragging();
             },
             child: AppBar(
-              title: Text(
-                appBarTitle,
-                style: const TextStyle(
-                  fontSize: 18
-                ),
-              ),
-              backgroundColor: const Color.fromARGB(255, 242, 231, 250),
+              title: Text(appBarTitle), // 使用变量来设置标题
+              backgroundColor:
+                  const Color.fromARGB(255, 242, 231, 250), // 固定背景颜色
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.remove, color: Colors.blue, size: 18),
+                  icon: const Icon(Icons.remove, color: Colors.blue),
                   onPressed: () {
                     windowManager.minimize();
                   },
                 ),
                 IconButton(
-                  icon: const Icon(Icons.crop_square, color: Colors.blue, size: 18),
+                  icon: const Icon(Icons.crop_square, color: Colors.blue),
                   onPressed: () {
                     windowManager.isMaximized().then((isMaximized) {
                       if (isMaximized) {
@@ -287,7 +287,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: Colors.blue, size: 18),
+                  icon: const Icon(Icons.close, color: Colors.blue),
                   onPressed: () {
                     windowManager.close();
                   },
@@ -300,7 +300,7 @@ class _MyHomePageState extends State<MyHomePage> {
         body: Row(
           children: [
             AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
+              duration: const Duration(milliseconds: 300),
               width: _showIconsOnly ? 70 : 250,
               child: Drawer(
                 child: Container(
@@ -315,29 +315,45 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: ListView(
                           padding: EdgeInsets.zero,
                           children: <Widget>[
-                            Center(
-                              child: ListTile(
-                                leading:
-                                    const Icon(Icons.home, color: Colors.blue),
-                                title: _showText ? const Text('首页') : null,
-                                onTap: () => _onItemTapped(0),
-                              ),
+                            ListTile(
+                              leading:
+                                  const Icon(Icons.home, color: Colors.blue),
+                              title: _showText ? const Text('首页') : null,
+                              selected: _selectedIndex == 0,
+                              tileColor: _selectedIndex == 0
+                                  ? Colors.lightBlueAccent
+                                  : null,
+                              onTap: () => _onItemTapped(0),
                             ),
-                            Center(
-                              child: ListTile(
-                                leading:
-                                    const Icon(Icons.add, color: Colors.blue),
-                                title: _showText ? const Text('新单词') : null,
-                                onTap: () => _onItemTapped(1),
-                              ),
+                            ListTile(
+                              leading:
+                                  const Icon(Icons.add, color: Colors.blue),
+                              title: _showText ? const Text('新单词') : null,
+                              selected: _selectedIndex == 1,
+                              tileColor: _selectedIndex == 1
+                                  ? Colors.lightBlueAccent
+                                  : null,
+                              onTap: () => _onItemTapped(1),
                             ),
-                            Center(
-                              child: ListTile(
-                                leading: const Icon(Icons.favorite,
-                                    color: Colors.blue),
-                                title: _showText ? const Text('收藏') : null,
-                                onTap: () => _onItemTapped(2),
-                              ),
+                            ListTile(
+                              leading: const Icon(Icons.favorite,
+                                  color: Colors.blue),
+                              title: _showText ? const Text('收藏') : null,
+                              selected: _selectedIndex == 2,
+                              tileColor: _selectedIndex == 2
+                                  ? Colors.lightBlueAccent
+                                  : null,
+                              onTap: () => _onItemTapped(2),
+                            ),
+                            ListTile(
+                              leading: const Icon(Icons.search,
+                                  color: Colors.blue), // 添加搜索图标
+                              title: _showText ? const Text('搜索') : null,
+                              selected: _selectedIndex == 3,
+                              tileColor: _selectedIndex == 3
+                                  ? Colors.lightBlueAccent
+                                  : null,
+                              onTap: () => _onItemTapped(3), // 点击跳转到搜索页面
                             ),
                           ],
                         ),
@@ -445,12 +461,14 @@ class _MyHomePageState extends State<MyHomePage> {
           TextField(
             controller: _wordController,
             decoration: const InputDecoration(
-                labelText: '输入新单词', icon: Icon(Icons.language, color: Colors.blue)),
+                labelText: '输入新单词',
+                icon: Icon(Icons.language, color: Colors.blue)),
           ),
           TextField(
             controller: _meaningController,
             decoration: const InputDecoration(
-                labelText: '输入中文意思（选填）', icon: Icon(Icons.translate, color: Colors.blue)),
+                labelText: '输入中文意思（选填）',
+                icon: Icon(Icons.translate, color: Colors.blue)),
           ),
           const SizedBox(height: 20), // 添加间距
           Wrap(
@@ -475,19 +493,15 @@ class _MyHomePageState extends State<MyHomePage> {
           const SizedBox(height: 20), // 添加间距
           ElevatedButton.icon(
             onPressed: () {
-              _addWord(
-                _wordController.text, _meaningController.text,
-                List<String>.from(_selectedTypes)
-              );
+              _addWord(_wordController.text, _meaningController.text,
+                  List<String>.from(_selectedTypes));
               _wordController.clear();
               _meaningController.clear();
               _selectedTypes.clear();
             },
             style: ButtonStyle(
-              backgroundColor: WidgetStateProperty .all(
-                const Color.fromARGB(255, 221, 245, 255)
-              )
-            ),
+                backgroundColor: WidgetStateProperty.all(
+                    const Color.fromARGB(255, 221, 245, 255))),
             icon: const Icon(Icons.add, color: Colors.blue),
             label: const Text(
               '添加单词',
@@ -598,6 +612,110 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildSearchPage() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  decoration: const InputDecoration(
+                    labelText: '搜索单词',
+                    icon: Icon(Icons.search, color: Colors.blue),
+                  ),
+                  onChanged: (query) {
+                    setState(() {
+                      _searchQuery = query;
+                    });
+                  },
+                  controller: TextEditingController(text: _searchQuery),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.clear, color: Colors.blue),
+                onPressed: () {
+                  setState(() {
+                    _searchQuery = '';
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: FutureBuilder<List<Map<String, dynamic>>>(
+            future: _loadWords(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              final words = snapshot.data!
+                  .where((word) =>
+                      word['word'].contains(_searchQuery) ||
+                      word['meaning'].contains(_searchQuery))
+                  .toList();
+              if (words.isEmpty) {
+                return const Center(
+                  child: Text(
+                    '没有匹配的单词~',
+                    style: TextStyle(fontSize: 24, color: Colors.grey),
+                  ),
+                );
+              }
+              return ListView.builder(
+                itemCount: words.length,
+                itemBuilder: (context, index) {
+                  final word = words[index];
+                  final types = word['meaning'].isNotEmpty
+                      ? ' ${word['types'].join(' ')}'
+                      : '${word['types'].join(' ')}';
+                  return ListTile(
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          word['word']!,
+                          style:
+                              const TextStyle(fontSize: 24, color: Colors.blue),
+                        ),
+                        if (word['meaning']!.isNotEmpty || types.isNotEmpty)
+                          Text(
+                            '${word['meaning']!}$types',
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.grey),
+                          ),
+                      ],
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            word['favorite']
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: word['favorite'] ? Colors.red : null,
+                          ),
+                          onPressed: () => _toggleFavorite(word['word']!),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.blue),
+                          onPressed: () => _confirmDeleteWord(word['word']!),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
