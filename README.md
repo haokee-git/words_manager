@@ -16,4 +16,8 @@ All words are saved to the words_manager folder under the system documents folde
 
 ## Installation | 安装
 
+You can download it from the [Release page] (https://github.com/haokee-git/words_manager/releases). Considering that friends in China, if the download speed is too slow, you can use the [123 Pan link] (https://www.123684.com/s/OkLLVv-DasBH) that is updated synchronously with the Release page to download.
+
+---
+
 可以在 [Release 页面](https://github.com/haokee-git/words_manager/releases) 内进行下载。考虑到中国国内的朋友们，如果下载速度过慢的情况下，可以使用与 Release 页面同步更新的 [123 云盘链接](https://www.123684.com/s/OkLLVv-DasBH) 进行下载。
