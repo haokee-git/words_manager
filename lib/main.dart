@@ -630,6 +630,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     labelText: '搜索单词',
                     icon: Icon(Icons.search, color: Colors.blue),
                   ),
+                  controller: TextEditingController(text: _searchQuery),
                   onChanged: (query) {
                     setState(() {
                       _searchQuery = query;
