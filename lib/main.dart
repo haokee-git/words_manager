@@ -34,7 +34,14 @@ class MyApp extends StatelessWidget {
       title: '单词管理器',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        fontFamily: 'PingFang SC'
+        fontFamily: 'PingFang SC',
+        appBarTheme: const AppBarTheme(
+          surfaceTintColor: Colors.transparent,
+          titleTextStyle: TextStyle(
+              color: Color.fromARGB(255, 64, 64, 64),
+              fontSize: 20,
+              fontFamily: 'PingFang SC'),
+        ),
       ),
       home: const MyHomePage(),
     );
@@ -55,6 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _wordController = TextEditingController();
   final TextEditingController _meaningController = TextEditingController();
   final List<String> _selectedTypes = [];
+  String appBarTitle = '单词管理器';
 
   @override
   void initState() {
@@ -77,10 +85,16 @@ class _MyHomePageState extends State<MyHomePage> {
     return Directory('${directory.path}/words_manager');
   }
 
-  Future<void> _addWord(String word, String? meaning, List<String> types, {bool favorite = false}) async {
+  Future<void> _addWord(String word, String? meaning, List<String> types,
+      {bool favorite = false}) async {
     if (word.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('单词不能为空')),
+        const SnackBar(
+            content: Text(
+              '单词不能为空',
+              style: TextStyle(color: Color.fromARGB(255, 64, 64, 64)),
+            ),
+            backgroundColor: Color.fromARGB(255, 232, 223, 238)),
       );
       return;
     }
@@ -90,15 +104,26 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (await file.exists()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('不能有相同的单词')),
+        const SnackBar(
+            content: Text(
+              '不能有相同的单词',
+              style: TextStyle(color: Color.fromARGB(255, 64, 64, 64)),
+            ),
+            backgroundColor: Color.fromARGB(255, 232, 223, 238)),
       );
       return;
     }
 
-    await file.writeAsString('$word\n${meaning ?? ''}\n${types.join(' ')}\n$favorite');
+    await file.writeAsString(
+        '$word\n${meaning ?? ''}\n${types.join(' ')}\n$favorite');
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('单词添加成功')),
+      const SnackBar(
+          content: Text(
+            '单词添加成功',
+            style: TextStyle(color: Color.fromARGB(255, 64, 64, 64)),
+          ),
+          backgroundColor: Color.fromARGB(255, 232, 223, 238)),
     );
     setState(() {}); // 刷新页面
   }
@@ -124,7 +149,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<List<Map<String, dynamic>>> _loadWords({bool favoriteOnly = false}) async {
+  Future<List<Map<String, dynamic>>> _loadWords(
+      {bool favoriteOnly = false}) async {
     final directory = await _getAppDataDirectory();
     final files = directory.listSync();
     final words = <Map<String, dynamic>>[];
@@ -149,6 +175,24 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+
+      switch (index) {
+        case 0:
+          appBarTitle = '单词管理器 - 首页';
+          windowManager.setTitle('单词管理器 - 首页');
+          break;
+        case 1:
+          appBarTitle = '单词管理器 - 新单词';
+          windowManager.setTitle('单词管理器 - 新单词');
+          break;
+        case 2:
+          appBarTitle = '单词管理器 - 收藏';
+          windowManager.setTitle('单词管理器 - 收藏');
+          break;
+        default:
+          appBarTitle = '单词管理器';
+          windowManager.setTitle('单词管理器');
+      }
     });
   }
 
@@ -156,7 +200,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _showIconsOnly = !_showIconsOnly;
       if (!_showIconsOnly) {
-        Future.delayed(const Duration(milliseconds: 300), () {
+        Future.delayed(const Duration(milliseconds: 200), () {
           setState(() {
             _showText = true;
           });
@@ -204,7 +248,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.purple, width: 0.5), // 添加紫色边框
+        border: Border.all(
+            color: const Color.fromARGB(255, 177, 132, 255),
+            width: 0.7), // 添加边框
       ),
       child: Scaffold(
         appBar: PreferredSize(
@@ -214,16 +260,22 @@ class _MyHomePageState extends State<MyHomePage> {
               windowManager.startDragging();
             },
             child: AppBar(
-              title: const Text('单词管理器'),
+              title: Text(
+                appBarTitle,
+                style: const TextStyle(
+                  fontSize: 18
+                ),
+              ),
+              backgroundColor: const Color.fromARGB(255, 242, 231, 250),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.remove),
+                  icon: const Icon(Icons.remove, color: Colors.blue, size: 18),
                   onPressed: () {
                     windowManager.minimize();
                   },
                 ),
                 IconButton(
-                  icon: const Icon(Icons.crop_square),
+                  icon: const Icon(Icons.crop_square, color: Colors.blue, size: 18),
                   onPressed: () {
                     windowManager.isMaximized().then((isMaximized) {
                       if (isMaximized) {
@@ -235,7 +287,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close),
+                  icon: const Icon(Icons.close, color: Colors.blue, size: 18),
                   onPressed: () {
                     windowManager.close();
                   },
@@ -248,39 +300,50 @@ class _MyHomePageState extends State<MyHomePage> {
         body: Row(
           children: [
             AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 200),
               width: _showIconsOnly ? 70 : 250,
               child: Drawer(
-                child: Column(
-                  children: <Widget>[
-                    ListTile(
-                      leading: const Icon(Icons.menu),
-                      title: _showText ? const Text('只显示图标') : null,
-                      onTap: _toggleShowIconsOnly,
-                    ),
-                    Expanded(
-                      child: ListView(
-                        padding: EdgeInsets.zero,
-                        children: <Widget>[
-                          ListTile(
-                            leading: const Icon(Icons.home),
-                            title: _showText ? const Text('首页') : null,
-                            onTap: () => _onItemTapped(0),
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.add),
-                            title: _showText ? const Text('新单词') : null,
-                            onTap: () => _onItemTapped(1),
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.favorite),
-                            title: _showText ? const Text('收藏') : null,
-                            onTap: () => _onItemTapped(2),
-                          ),
-                        ],
+                child: Container(
+                  child: Column(
+                    children: <Widget>[
+                      ListTile(
+                        leading: const Icon(Icons.menu, color: Colors.blue),
+                        title: _showText ? const Text('只显示图标') : null,
+                        onTap: _toggleShowIconsOnly,
                       ),
-                    ),
-                  ],
+                      Expanded(
+                        child: ListView(
+                          padding: EdgeInsets.zero,
+                          children: <Widget>[
+                            Center(
+                              child: ListTile(
+                                leading:
+                                    const Icon(Icons.home, color: Colors.blue),
+                                title: _showText ? const Text('首页') : null,
+                                onTap: () => _onItemTapped(0),
+                              ),
+                            ),
+                            Center(
+                              child: ListTile(
+                                leading:
+                                    const Icon(Icons.add, color: Colors.blue),
+                                title: _showText ? const Text('新单词') : null,
+                                onTap: () => _onItemTapped(1),
+                              ),
+                            ),
+                            Center(
+                              child: ListTile(
+                                leading: const Icon(Icons.favorite,
+                                    color: Colors.blue),
+                                title: _showText ? const Text('收藏') : null,
+                                onTap: () => _onItemTapped(2),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -312,44 +375,63 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           );
         }
-        return ListView.builder(
-          itemCount: words.length,
-          itemBuilder: (context, index) {
-            final word = words[index];
-            final types = word['meaning'].isNotEmpty ? ' ${word['types'].join(' ')}' : '${word['types'].join(' ')}';
-            return ListTile(
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    word['word']!,
-                    style: const TextStyle(fontSize: 24, color: Colors.blue),
-                  ),
-                  if (word['meaning']!.isNotEmpty || types.isNotEmpty)
-                    Text(
-                      '${word['meaning']!}$types',
-                      style: const TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                ],
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                '单词总数: ${words.length}',
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
               ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      word['favorite'] ? Icons.favorite : Icons.favorite_border,
-                      color: word['favorite'] ? Colors.red : null,
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: words.length,
+                itemBuilder: (context, index) {
+                  final word = words[index];
+                  final types = word['meaning'].isNotEmpty
+                      ? ' ${word['types'].join(' ')}'
+                      : '${word['types'].join(' ')}';
+                  return ListTile(
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          word['word']!,
+                          style:
+                              const TextStyle(fontSize: 24, color: Colors.blue),
+                        ),
+                        if (word['meaning']!.isNotEmpty || types.isNotEmpty)
+                          Text(
+                            '${word['meaning']!}$types',
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.grey),
+                          ),
+                      ],
                     ),
-                    onPressed: () => _toggleFavorite(word['word']!),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () => _confirmDeleteWord(word['word']!),
-                  ),
-                ],
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            word['favorite']
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: word['favorite'] ? Colors.red : null,
+                          ),
+                          onPressed: () => _toggleFavorite(word['word']!),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.blue),
+                          onPressed: () => _confirmDeleteWord(word['word']!),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
-            );
-          },
+            ),
+          ],
         );
       },
     );
@@ -362,16 +444,22 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           TextField(
             controller: _wordController,
-            decoration: const InputDecoration(labelText: '输入新单词'),
+            decoration: const InputDecoration(
+                labelText: '输入新单词', icon: Icon(Icons.language, color: Colors.blue)),
           ),
           TextField(
             controller: _meaningController,
-            decoration: const InputDecoration(labelText: '输入中文意思（选填）'),
+            decoration: const InputDecoration(
+                labelText: '输入中文意思（选填）', icon: Icon(Icons.translate, color: Colors.blue)),
           ),
           const SizedBox(height: 20), // 添加间距
           Wrap(
             spacing: 10.0,
             children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 5.0),
+                child: Text('词性：', style: TextStyle(fontSize: 15)),
+              ),
               _buildCheckbox('n.'),
               _buildCheckbox('pron.'),
               _buildCheckbox('adj.'),
@@ -385,14 +473,26 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           const SizedBox(height: 20), // 添加间距
-          ElevatedButton(
+          ElevatedButton.icon(
             onPressed: () {
-              _addWord(_wordController.text, _meaningController.text, List<String>.from(_selectedTypes));
+              _addWord(
+                _wordController.text, _meaningController.text,
+                List<String>.from(_selectedTypes)
+              );
               _wordController.clear();
               _meaningController.clear();
               _selectedTypes.clear();
             },
-            child: const Text('添加单词'),
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty .all(
+                const Color.fromARGB(255, 221, 245, 255)
+              )
+            ),
+            icon: const Icon(Icons.add, color: Colors.blue),
+            label: const Text(
+              '添加单词',
+              style: TextStyle(color: Colors.blue),
+            ),
           ),
         ],
       ),
@@ -414,6 +514,9 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             });
           },
+          checkColor: Colors.lightBlue[100],
+          activeColor: Colors.blue,
+          side: const BorderSide(width: 1, color: Colors.blue),
         ),
         Text(type),
       ],
@@ -436,44 +539,63 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           );
         }
-        return ListView.builder(
-          itemCount: words.length,
-          itemBuilder: (context, index) {
-            final word = words[index];
-            final types = word['meaning'].isNotEmpty ? ' ${word['types'].join(' ')}' : '${word['types'].join(' ')}';
-            return ListTile(
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    word['word']!,
-                    style: const TextStyle(fontSize: 24, color: Colors.blue),
-                  ),
-                  if (word['meaning']!.isNotEmpty || types.isNotEmpty)
-                    Text(
-                      '${word['meaning']!}$types',
-                      style: const TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                ],
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                '收藏总数: ${words.length}',
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
               ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      word['favorite'] ? Icons.favorite : Icons.favorite_border,
-                      color: word['favorite'] ? Colors.red : null,
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: words.length,
+                itemBuilder: (context, index) {
+                  final word = words[index];
+                  final types = word['meaning'].isNotEmpty
+                      ? ' ${word['types'].join(' ')}'
+                      : '${word['types'].join(' ')}';
+                  return ListTile(
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          word['word']!,
+                          style:
+                              const TextStyle(fontSize: 24, color: Colors.blue),
+                        ),
+                        if (word['meaning']!.isNotEmpty || types.isNotEmpty)
+                          Text(
+                            '${word['meaning']!}$types',
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.grey),
+                          ),
+                      ],
                     ),
-                    onPressed: () => _toggleFavorite(word['word']!),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () => _confirmDeleteWord(word['word']!),
-                  ),
-                ],
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            word['favorite']
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: word['favorite'] ? Colors.red : null,
+                          ),
+                          onPressed: () => _toggleFavorite(word['word']!),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.blue),
+                          onPressed: () => _confirmDeleteWord(word['word']!),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
-            );
-          },
+            ),
+          ],
         );
       },
     );
